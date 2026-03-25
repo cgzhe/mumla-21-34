@@ -16,7 +16,7 @@ public class AppearanceSettingsFragment extends MumlaPreferenceFragment {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.settings_appearance, rootKey);
 
-        ListPreference languagePreference = findPreference(PREF_LANGUAGE);
+        ListPreference languagePreference = (ListPreference) findPreference(PREF_LANGUAGE);
         if (languagePreference != null) {
             String[] codes = getResources().getStringArray(R.array.languageValues);
             String[] listNames = new String[codes.length + 1];

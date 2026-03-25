@@ -40,10 +40,9 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -153,7 +152,7 @@ public class PublicServerListFragment extends Fragment implements OnItemClickLis
         layout.addView(usernameField);
         int horizontalPadding = (int) getResources().getDimension(R.dimen.padding_medium);
         layout.setPadding(horizontalPadding, 0, horizontalPadding, 0);
-        new MaterialAlertDialogBuilder(requireActivity())
+        new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.addFavorite)
                 .setView(layout)
                 .setPositiveButton(R.string.add, (dialog, which) -> {
@@ -181,7 +180,7 @@ public class PublicServerListFragment extends Fragment implements OnItemClickLis
     }
 
     private void showMatchDialog() {
-        new MaterialAlertDialogBuilder(requireActivity())
+        new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.server_match)
                 .setMessage(R.string.server_match_description)
                 .setPositiveButton(R.string.search, (dialog, which) -> findOptimalServer())
@@ -195,7 +194,7 @@ public class PublicServerListFragment extends Fragment implements OnItemClickLis
     }
 
     private void showSortDialog() {
-        new MaterialAlertDialogBuilder(requireActivity())
+        new AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.sortBy)
                 .setItems(new String[]{getString(R.string.name), getString(R.string.country)}, new SortClickListener())
                 .show();
@@ -206,7 +205,7 @@ public class PublicServerListFragment extends Fragment implements OnItemClickLis
         final EditText nameText = dialogView.findViewById(R.id.server_search_name);
         final EditText countryText = dialogView.findViewById(R.id.server_search_country);
 
-        final AlertDialog alertDialog = new MaterialAlertDialogBuilder(getActivity())
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.search)
                 .setView(dialogView)
                 .setPositiveButton(R.string.search, (dialog, which) -> {
@@ -357,7 +356,7 @@ public class PublicServerListFragment extends Fragment implements OnItemClickLis
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog = new MaterialAlertDialogBuilder(requireActivity())
+            mProgressDialog = new AlertDialog.Builder(requireActivity())
                     .setMessage(R.string.server_match_progress)
                     .setCancelable(true)
                     .setOnCancelListener(dialog -> cancel(true))
@@ -417,7 +416,7 @@ public class PublicServerListFragment extends Fragment implements OnItemClickLis
             final PublicServer publicServer = response == null ? null : (PublicServer) response.getServer();
             mProgressDialog.hide();
             if (publicServer != null) {
-                new MaterialAlertDialogBuilder(requireActivity())
+                new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.server_match_found)
                         .setMessage(getString(R.string.server_match_info,
                                 publicServer.getName(),
@@ -433,7 +432,7 @@ public class PublicServerListFragment extends Fragment implements OnItemClickLis
                         .setNegativeButton(android.R.string.cancel, null)
                         .show();
             } else {
-                new MaterialAlertDialogBuilder(requireActivity())
+                new AlertDialog.Builder(requireActivity())
                         .setTitle(R.string.server_match_not_found)
                         .setMessage(R.string.server_match_expand_country)
                         .setPositiveButton(R.string.expand, (dialog, which) -> {

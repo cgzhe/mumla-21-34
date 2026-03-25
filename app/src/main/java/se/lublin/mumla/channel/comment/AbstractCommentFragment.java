@@ -28,7 +28,7 @@ import android.widget.TabHost;
 
 import androidx.fragment.app.DialogFragment;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import se.lublin.humla.IHumlaService;
 import se.lublin.mumla.R;
@@ -108,14 +108,14 @@ public abstract class AbstractCommentFragment extends DialogFragment {
         mTabHost.setCurrentTab(isEditing() ? 1 : 0);
 
         if (isEditing()) {
-            return new MaterialAlertDialogBuilder(requireActivity())
+            return new AlertDialog.Builder(requireActivity())
                     .setView(view)
                     .setNegativeButton(R.string.close, null)
                     .setPositiveButton(R.string.save, (dialog, which) ->
                             editComment(mProvider.getService(), mCommentEdit.getText().toString()))
                     .create();
         } else {
-            return new MaterialAlertDialogBuilder(requireActivity())
+            return new AlertDialog.Builder(requireActivity())
                     .setView(view)
                     .setNegativeButton(R.string.close, null)
                     .create();

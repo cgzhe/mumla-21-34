@@ -1,17 +1,19 @@
 package se.lublin.mumla.app;
 
-import static androidx.appcompat.app.AppCompatDelegate.setApplicationLocales;
-import static androidx.core.os.LocaleListCompat.forLanguageTags;
-import static androidx.core.os.LocaleListCompat.getEmptyLocaleList;
 import static se.lublin.mumla.Settings.PREF_LANGUAGE;
 import static se.lublin.mumla.Settings.PREF_THEME;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.os.Build;
+import android.os.LocaleList;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
+
+import java.util.Locale;
 
 public class MumlaApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
     @Override
@@ -19,6 +21,7 @@ public class MumlaApplication extends Application implements SharedPreferences.O
         super.onCreate();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         applyTheme(preferences);
+        applyLanguage(preferences);
         preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -29,13 +32,31 @@ public class MumlaApplication extends Application implements SharedPreferences.O
         }
         switch (key) {
             case PREF_LANGUAGE:
-                String language = preferences.getString(PREF_LANGUAGE, "system");
-                setApplicationLocales(language.equals("system") ? getEmptyLocaleList() : forLanguageTags(language));
+                applyLanguage(preferences);
                 break;
             case PREF_THEME:
                 applyTheme(preferences);
                 break;
         }
+    }
+
+    private void applyLanguage(SharedPreferences preferences) {
+        String language = preferences.getString(PREF_LANGUAGE, "system");
+        if (language.equals("system")) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                getResources().getConfiguration().setLocales(LocaleList.getDefault());
+            } else {
+                getResources().getConfiguration().locale = Locale.getDefault();
+            }
+        } else {
+            Locale locale = new Locale(language);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                getResources().getConfiguration().setLocales(new LocaleList(locale));
+            } else {
+                getResources().getConfiguration().locale = locale;
+            }
+        }
+        getResources().updateConfiguration(getResources().getConfiguration(), getResources().getDisplayMetrics());
     }
 
     private static void applyTheme(SharedPreferences preferences) {

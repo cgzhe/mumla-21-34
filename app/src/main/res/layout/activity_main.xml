@@ -28,21 +28,21 @@
         android:orientation="vertical">
 
         <!-- Using TweakedAppBarLayout to always have dark themed appbar -->
-        <com.google.android.material.appbar.AppBarLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/TweakedAppBarLayout">
 
             <!-- The special popupTheme here makes it so popupmenu is will still have a light theme,
             even though the AppBar has dark. See attrs.xml and themes.xml -->
-            <com.google.android.material.appbar.MaterialToolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="?attr/popupOverlay"
                 app:title="@string/app_name" />
 
-        </com.google.android.material.appbar.AppBarLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <FrameLayout
             android:id="@+id/content_frame"

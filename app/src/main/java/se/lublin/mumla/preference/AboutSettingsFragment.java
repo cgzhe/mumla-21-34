@@ -27,11 +27,6 @@ public class AboutSettingsFragment extends MumlaPreferenceFragment {
         String summary = String.format("%s (code %s)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE);
         if (BuildConfig.FLAVOR.equals("foss")) {
             summary += "\nFOSS flavor";
-        } else if (BuildConfig.FLAVOR.equals("beta")) {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            summary += String.format("\nBeta flavor with versioncode %s", BuildConfig.VERSION_CODE);
-            summary += String.format("\nBuildtime %s UTC", df.format(new Date(BuildConfig.TIMESTAMP)));
         } else if (BuildConfig.FLAVOR.equals("donation")) {
             summary += String.format("\n*) %s", getString(R.string.donation_thanks));
         }

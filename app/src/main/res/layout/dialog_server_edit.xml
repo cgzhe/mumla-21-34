@@ -15,77 +15,83 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/server_edit_name_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/server_label" />
-
-    <EditText
-        android:id="@+id/server_edit_name"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text" />
+    android:scrollbars="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
         <TextView
-            android:layout_width="0dp"
+            android:id="@+id/server_edit_name_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/server_host" />
+            android:text="@string/server_label" />
+
+        <EditText
+            android:id="@+id/server_edit_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/server_host" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/server_port" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/server_edit_host"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="textUri" />
+            <EditText
+                android:id="@+id/server_edit_port"
+                android:layout_width="wrap_content"
+                android:maxEms="5"
+                android:layout_height="wrap_content"
+                android:hint="@string/default_"
+                android:inputType="number"
+                android:maxLength="5">
+            </EditText>
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/server_port" />
-    </LinearLayout>
+            android:text="@string/server_username" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
         <EditText
-            android:id="@+id/server_edit_host"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="textUri" />
-        <EditText
-            android:id="@+id/server_edit_port"
+            android:layout_width="match_parent"
+            android:id="@+id/server_edit_username"
+            android:inputType="text" />
+
+        <TextView
             android:layout_width="wrap_content"
-            android:maxEms="5"
             android:layout_height="wrap_content"
-            android:hint="@string/default_"
-            android:inputType="number"
-            android:maxLength="5">
-        </EditText>
+            android:text="@string/server_password" />
+
+        <EditText
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/server_edit_password"
+            android:inputType="textPassword" />
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/server_username" />
-
-    <EditText
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/server_edit_username"
-        android:inputType="text" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/server_password" />
-
-    <EditText
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/server_edit_password"
-        android:inputType="textPassword" />
-</LinearLayout>
+</ScrollView>

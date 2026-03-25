@@ -376,11 +376,7 @@ public class MumlaService extends HumlaService implements
             setSelfMuteDeafState(mSettings.isMuted(), mSettings.isDeafened());
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            registerReceiver(mTalkReceiver, new IntentFilter(TalkBroadcastReceiver.BROADCAST_TALK), RECEIVER_EXPORTED);
-        } else {
-            registerReceiver(mTalkReceiver, new IntentFilter(TalkBroadcastReceiver.BROADCAST_TALK));
-        }
+        registerReceiver(mTalkReceiver, new IntentFilter(TalkBroadcastReceiver.BROADCAST_TALK));
 
         if (mSettings.isHotCornerEnabled()) {
             mHotCorner.setShown(true);
@@ -526,8 +522,8 @@ public class MumlaService extends HumlaService implements
     @Override
     public void onOverlayToggled() {
         // Ditch notification shade/panel to make overlay presence/permission request visible.
-        // But on Android 12 that's no longer allowed.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+        // But on Android 9 that's no longer allowed.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             Intent close = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
             getApplicationContext().sendBroadcast(close);
         }

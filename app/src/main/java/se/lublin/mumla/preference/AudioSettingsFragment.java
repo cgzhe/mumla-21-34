@@ -18,14 +18,14 @@ public class AudioSettingsFragment extends MumlaPreferenceFragment {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.settings_audio, rootKey);
 
-        ListPreference inputPreference = getPreferenceScreen().findPreference(Settings.PREF_INPUT_METHOD);
+        ListPreference inputPreference = (ListPreference) getPreferenceScreen().findPreference(Settings.PREF_INPUT_METHOD);
         requireNonNull(inputPreference).setOnPreferenceChangeListener((preference, newValue) -> {
             updateAudioDependents(getPreferenceScreen(), (String) newValue);
             return true;
         });
 
         // Scan each bitrate and determine if the device supports it
-        ListPreference inputQualityPreference = getPreferenceScreen().findPreference(Settings.PREF_INPUT_RATE);
+        ListPreference inputQualityPreference = (ListPreference) getPreferenceScreen().findPreference(Settings.PREF_INPUT_RATE);
         String[] bitrateNames = new String[requireNonNull(inputQualityPreference).getEntryValues().length];
         for (int x = 0; x < bitrateNames.length; x++) {
             int bitrate = Integer.parseInt(inputQualityPreference.getEntryValues()[x].toString());
@@ -38,8 +38,8 @@ public class AudioSettingsFragment extends MumlaPreferenceFragment {
     }
 
     private static void updateAudioDependents(PreferenceScreen screen, String inputMethod) {
-        PreferenceCategory pttCategory = screen.findPreference("ptt_settings");
-        PreferenceCategory vadCategory = screen.findPreference("vad_settings");
+        PreferenceCategory pttCategory = (PreferenceCategory) screen.findPreference("ptt_settings");
+        PreferenceCategory vadCategory = (PreferenceCategory) screen.findPreference("vad_settings");
         requireNonNull(pttCategory).setEnabled(Settings.ARRAY_INPUT_METHOD_PTT.equals(inputMethod));
         requireNonNull(vadCategory).setEnabled(Settings.ARRAY_INPUT_METHOD_VOICE.equals(inputMethod));
     }

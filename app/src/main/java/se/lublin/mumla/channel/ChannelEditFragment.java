@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import se.lublin.humla.IHumlaSession;
 import se.lublin.humla.model.IChannel;
@@ -79,7 +79,7 @@ public class ChannelEditFragment extends DialogFragment {
             mTemporaryBox.setEnabled(!onlyTemp);
         }
 
-        return new MaterialAlertDialogBuilder(requireContext())
+        return new AlertDialog.Builder(requireContext())
                 .setTitle(isAdding() ? R.string.channel_add : R.string.channel_edit)
                 .setView(view)
                 .setPositiveButton(isAdding() ? R.string.add : R.string.save, (dialog, which) -> {

@@ -19,8 +19,7 @@ package se.lublin.mumla.service;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
-import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE;
+
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -111,11 +110,7 @@ public class MumlaConnectionNotification {
         filter.addAction(BROADCAST_MUTE);
         filter.addAction(BROADCAST_OVERLAY);
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                mService.registerReceiver(mNotificationReceiver, filter, RECEIVER_NOT_EXPORTED);
-            } else {
-                mService.registerReceiver(mNotificationReceiver, filter);
-            }
+            mService.registerReceiver(mNotificationReceiver, filter);
         } catch (IllegalArgumentException e) {
             // Thrown if receiver is already registered.
             e.printStackTrace();
@@ -190,11 +185,7 @@ public class MumlaConnectionNotification {
         builder.setContentIntent(pendingIntent);
 
         Notification notification = builder.build();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            mService.startForeground(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_MICROPHONE);
-        } else {
-            mService.startForeground(NOTIFICATION_ID, notification);
-        }
+        mService.startForeground(NOTIFICATION_ID, notification);
         return notification;
     }
 

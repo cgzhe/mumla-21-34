@@ -32,7 +32,7 @@ import android.widget.GridView;
 
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import java.util.List;
 
@@ -132,7 +132,7 @@ public class FavouriteServerListFragment extends Fragment implements OnItemClick
     }
 
     public void deleteServer(final Server server) {
-        new MaterialAlertDialogBuilder(requireContext())
+        new AlertDialog.Builder(requireContext())
                 .setMessage(R.string.confirm_delete_server)
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
                     mDatabaseProvider.getDatabase().removeServer(server);

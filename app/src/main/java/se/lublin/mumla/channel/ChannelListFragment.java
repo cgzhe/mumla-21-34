@@ -17,7 +17,7 @@
 
 package se.lublin.mumla.channel;
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+
 
 import android.app.Activity;
 import android.app.SearchManager;
@@ -194,11 +194,7 @@ public class ChannelListFragment extends HumlaServiceFragment implements OnChann
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         registerForContextMenu(mChannelView);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            getActivity().registerReceiver(mBluetoothReceiver, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_CHANGED), RECEIVER_NOT_EXPORTED);
-        } else {
-            getActivity().registerReceiver(mBluetoothReceiver, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_CHANGED));
-        }
+        getActivity().registerReceiver(mBluetoothReceiver, new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_CHANGED));
     }
 
     @Override

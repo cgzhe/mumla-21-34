@@ -18,13 +18,19 @@ public class SeekBarDialogPreference extends DialogPreference {
     public SeekBarDialogPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        try (TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs, R.styleable.SeekBarDialogPreference, 0, 0)) {
+        TypedArray a = null;
+        try {
+            a = context.getTheme().obtainStyledAttributes(
+                    attrs, R.styleable.SeekBarDialogPreference, 0, 0);
             mMax = a.getInt(R.styleable.SeekBarDialogPreference_max, 100);
             mMin = a.getInt(R.styleable.SeekBarDialogPreference_min, 0);
             mMultiplier = a.getInt(R.styleable.SeekBarDialogPreference_multiplier, 1);
             mSuffix = a.getString(R.styleable.SeekBarDialogPreference_android_text);
             mDefaultValue = a.getInt(R.styleable.SeekBarDialogPreference_android_defaultValue, 0);
+        } finally {
+            if (a != null) {
+                a.recycle();
+            }
         }
 
         setDialogLayoutResource(R.layout.dialog_seekbar_preference);

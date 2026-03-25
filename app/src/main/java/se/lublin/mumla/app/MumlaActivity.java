@@ -46,7 +46,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -61,9 +60,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.jetbrains.annotations.NotNull;
 import org.spongycastle.util.encoders.Hex;
 
 import java.net.InetSocketAddress;
@@ -227,7 +224,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
                     e.printStackTrace();
                     textView.setText(x509.toString());
                 }
-                new MaterialAlertDialogBuilder(MumlaActivity.this)
+                new AlertDialog.Builder(MumlaActivity.this)
                         .setTitle(R.string.untrusted_certificate)
                         .setView(layout)
                         .setPositiveButton(R.string.allow, (dialog, which) -> {
@@ -253,7 +250,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
 
         @Override
         public void onPermissionDenied(String reason) {
-            new MaterialAlertDialogBuilder(MumlaActivity.this)
+            new AlertDialog.Builder(MumlaActivity.this)
                     .setTitle(R.string.perm_denied)
                     .setMessage(reason)
                     .show();
@@ -269,26 +266,6 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (mService != null && mService.isConnected()) {
-                    new MaterialAlertDialogBuilder(MumlaActivity.this)
-                            .setMessage(getString(R.string.disconnectSure, mService.getTargetServer().getName()))
-                            .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                                mService.disconnect();
-                                loadDrawerFragment(DrawerAdapter.ITEM_FAVOURITES);
-                            })
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .show();
-                } else {
-                    setEnabled(false);
-                    getOnBackPressedDispatcher().onBackPressed();
-                    setEnabled(true);
-                }
-            }
-        });
 
         setStayAwake(mSettings.shouldStayAwake());
 
@@ -444,7 +421,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NotNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item))
             return true;
         if (item.getItemId() == R.id.action_disconnect) {
@@ -455,7 +432,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
     }
 
     @Override
-    public void onConfigurationChanged(@NotNull Configuration newConfig) {
+    public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
@@ -494,7 +471,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
         if (BuildConfig.FLAVOR.equals("donation")) {
             msg = getString(R.string.donation_thanks) + "\n\n" + msg;
         }
-        new MaterialAlertDialogBuilder(this)
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.first_run_generate_certificate_title)
                 .setMessage(msg)
                 .setPositiveButton(R.string.generate, (DialogInterface dialog, int which) -> {
@@ -570,16 +547,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !mPermPostNotificationsAsked) {
-            if (ContextCompat.checkSelfPermission(MumlaActivity.this,
-                    Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(MumlaActivity.this,
-                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                        PERMISSIONS_REQUEST_POST_NOTIFICATIONS);
-                return;
-            }
-        }
+        // Notifications permission is not required for Android 9 and below
 
         if (mServerPendingPerm == null) {
             Log.w(TAG, "No pending server after getting permissions");
@@ -591,7 +559,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
 
         // Check if we're already connected to a server; if so, inform user.
         if (mService != null && mService.isConnected()) {
-            new MaterialAlertDialogBuilder(this)
+            new AlertDialog.Builder(this)
                     .setMessage(R.string.reconnect_dialog_message)
                     .setPositiveButton(R.string.connect, (dialog, which) -> {
                         // Register an observer to reconnect to the new server once disconnected.
@@ -612,14 +580,14 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
         if (mSettings.isTorEnabled()) {
             if (!OrbotHelper.isOrbotInstalled(this)) {
                 mSettings.disableTor();
-                new MaterialAlertDialogBuilder(MumlaActivity.this)
+                new AlertDialog.Builder(MumlaActivity.this)
                         .setMessage(R.string.orbot_not_installed)
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
                 return;
             } else {
                 if (!isPortOpen(HumlaConnection.TOR_HOST, HumlaConnection.TOR_PORT, 2000)) {
-                    new MaterialAlertDialogBuilder(MumlaActivity.this)
+                    new AlertDialog.Builder(MumlaActivity.this)
                             .setMessage(getString(R.string.orbot_tor_failed, HumlaConnection.TOR_PORT))
                             .setPositiveButton(android.R.string.ok, null)
                             .show();
@@ -651,18 +619,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
                             Toast.LENGTH_LONG).show();
                 }
                 break;
-            case PERMISSIONS_REQUEST_POST_NOTIFICATIONS:
-                mPermPostNotificationsAsked = true;
-                if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    // This is inspired by https://stackoverflow.com/a/34612503
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(MumlaActivity.this,
-                            Manifest.permission.POST_NOTIFICATIONS)) {
-                        Toast.makeText(MumlaActivity.this,
-                                getString(R.string.grant_perm_notifications), Toast.LENGTH_LONG).show();
-                    }
-                }
-                connectToServerWithPerm();
-                break;
+
         }
     }
 
@@ -699,7 +656,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
         layout.addView(usernameField);
         int horizontalPadding = (int) getResources().getDimension(R.dimen.padding_medium);
         layout.setPadding(horizontalPadding, 0, horizontalPadding, 0);
-        new MaterialAlertDialogBuilder(this)
+        new AlertDialog.Builder(this)
                 .setView(layout)
                 .setTitle(R.string.connectToServer)
                 .setPositiveButton(R.string.connect, (dialog, which) -> {
@@ -741,7 +698,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
                 Server server = service.getTargetServer();
                 // SRV lookup is done later, so we no longer show the port in the connection
                 // progress dialog (and only the configured hostname)
-                mConnectingDialog = new MaterialAlertDialogBuilder(this)
+                mConnectingDialog = new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.connecting_to_server, server.getHost()) + (mSettings.isTorEnabled() ? " (Tor)" : ""))
                         .setView(R.layout.dialog_progress)
                         .setCancelable(true)
@@ -760,7 +717,7 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
                     if (getService() == null) {
                         break;
                     }
-                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MumlaActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MumlaActivity.this);
                     builder.setTitle(getString(R.string.connectionRefused) + (mSettings.isTorEnabled() ? " (Tor)" : ""));
                     HumlaException error = getService().getConnectionError();
                     if (error != null && mService.isReconnecting()) {
@@ -885,6 +842,22 @@ public class MumlaActivity extends AppCompatActivity implements ListView.OnItemC
             case CONNECT_ACTION:
                 connectToServer(server);
                 break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mService != null && mService.isConnected()) {
+            new AlertDialog.Builder(MumlaActivity.this)
+                    .setMessage(getString(R.string.disconnectSure, mService.getTargetServer().getName()))
+                    .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                        mService.disconnect();
+                        loadDrawerFragment(DrawerAdapter.ITEM_FAVOURITES);
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        } else {
+            super.onBackPressed();
         }
     }
 }

@@ -28,7 +28,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +77,7 @@ public class CertificateSelectActivity extends AppCompatActivity implements Dial
             }
         }
 
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.pref_certificate_title);
         ArrayAdapter<ICertificateItem> adapter = new ArrayAdapter<ICertificateItem>(this, android.R.layout.select_dialog_singlechoice, mCertificates) {
             @NonNull

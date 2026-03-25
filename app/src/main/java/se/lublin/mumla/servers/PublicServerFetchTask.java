@@ -31,8 +31,17 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import se.lublin.mumla.db.PublicServer;
 
@@ -42,6 +51,39 @@ import se.lublin.mumla.db.PublicServer;
 class PublicServerFetchTask extends AsyncTask<Void, Void, List<PublicServer>> {
     protected WeakReference<Context> contextRef;
     private static final String MUMBLE_PUBLIC_URL = "https://mumble.info/list2.cgi";
+    
+    // 创建一个信任所有证书的SSLContext
+    private static void trustAllCertificates() {
+        try {
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return null;
+                    }
+                    
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+                    
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+                }
+            };
+            
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            
+            // 信任所有主机名
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public PublicServerFetchTask(Context context) {
         contextRef = new WeakReference<>(context);
@@ -50,6 +92,9 @@ class PublicServerFetchTask extends AsyncTask<Void, Void, List<PublicServer>> {
     @Override
     protected List<PublicServer> doInBackground(Void... params) {
         try {
+            // 信任所有证书
+            trustAllCertificates();
+            
             // Fetch XML from server
             URL url = new URL(MUMBLE_PUBLIC_URL);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

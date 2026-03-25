@@ -26,7 +26,10 @@ import static android.view.inputmethod.EditorInfo.IME_NULL;
 import static androidx.core.content.ContextCompat.checkSelfPermission;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -56,12 +59,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts.GetContent;
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
 import androidx.exifinterface.media.ExifInterface;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -137,10 +135,8 @@ public class ChannelChatFragment extends HumlaServiceFragment implements ChatTar
     private EditText mChatTextEdit;
     private ImageButton mSendButton;
     private ChatTargetProvider mTargetProvider;
-    ActivityResultLauncher<String> imagePicker =
-            registerForActivityResult(new GetContent(), this::onImagePicked);
-    private final ActivityResultLauncher<String> readPermissionRequester =
-            registerForActivityResult(new RequestPermission(), this::onReadPermissionGranted);
+    private static final int REQUEST_READ_EXTERNAL_STORAGE = 1;
+    private static final int REQUEST_PICK_IMAGE = 2;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -170,6 +166,26 @@ public class ChannelChatFragment extends HumlaServiceFragment implements ChatTar
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+            onImagePicked(data.getData());
+        }
+    }
+
+    @Override
+        public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_READ_EXTERNAL_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_PICK_IMAGE);
+            }
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
@@ -178,16 +194,20 @@ public class ChannelChatFragment extends HumlaServiceFragment implements ChatTar
 
         ImageButton ImageSendButton = view.findViewById(R.id.chatImageSend);
         ImageSendButton.setOnClickListener(buttonView -> {
-            // Android <= 12 (SDK 32) needs extra permission
-            if (SDK_INT <= Build.VERSION_CODES.S_V2) {
+            // Android <= 9 (SDK 28) needs extra permission
+            if (SDK_INT <= Build.VERSION_CODES.P) {
                 if (checkSelfPermission(requireContext(), READ_EXTERNAL_STORAGE) != PERMISSION_GRANTED) {
-                    readPermissionRequester.launch(READ_EXTERNAL_STORAGE);
+                    requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
                 } else {
                     // Reaching here once app has gotten hold of the permission
-                    imagePicker.launch("image/*");
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, REQUEST_PICK_IMAGE);
                 }
             } else {
-                imagePicker.launch("image/*");
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, REQUEST_PICK_IMAGE);
             }
         });
 
@@ -261,7 +281,9 @@ public class ChannelChatFragment extends HumlaServiceFragment implements ChatTar
 
     private void onReadPermissionGranted(Boolean isGranted) {
         if (isGranted) {
-            imagePicker.launch("image/*");
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_PICK_IMAGE);
         } else {
             Toast.makeText(requireContext(), "Permission denied to read storage", Toast.LENGTH_LONG).show();
         }
@@ -329,7 +351,7 @@ public class ChannelChatFragment extends HumlaServiceFragment implements ChatTar
         preview.setAdjustViewBounds(true);
         preview.setScaleType(ImageView.ScaleType.FIT_CENTER);
         preview.setMaxHeight(Resources.getSystem().getDisplayMetrics().heightPixels / 3);
-        new MaterialAlertDialogBuilder(requireContext())
+        new AlertDialog.Builder(requireContext())
                 .setMessage(R.string.image_confirm_send)
                 .setPositiveButton(android.R.string.ok, (dlg, which) -> onImageConfirmed(resized))
                 .setNegativeButton(android.R.string.cancel, null)

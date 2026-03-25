@@ -20,7 +20,10 @@ package se.lublin.mumla.preference;
 import static android.os.Build.VERSION.SDK_INT;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -29,15 +32,11 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts.CreateDocument;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -66,8 +65,7 @@ public class CertificateExportActivity extends AppCompatActivity implements Dial
     private MumlaDatabase mDatabase;
     private List<DatabaseCertificate> mCertificates;
 
-    private final ActivityResultLauncher<String> documentCreator =
-            registerForActivityResult(new CreateDocument(), this::onDocumentCreated);
+    private static final int REQUEST_CREATE_DOCUMENT = 1;
     private static final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 2;
     private DatabaseCertificate mCertificatePending = null;
 
@@ -82,7 +80,7 @@ public class CertificateExportActivity extends AppCompatActivity implements Dial
             labels[i] = mCertificates.get(i).getName();
         }
 
-        new MaterialAlertDialogBuilder(this)
+        new AlertDialog.Builder(this)
                 .setTitle(R.string.pref_export_certificate_title)
                 .setItems(labels, this)
                 .setOnCancelListener(dialog -> finish())
@@ -96,14 +94,26 @@ public class CertificateExportActivity extends AppCompatActivity implements Dial
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CREATE_DOCUMENT && resultCode == RESULT_OK && data != null) {
+            onDocumentCreated(data.getData());
+        }
+    }
+
+    @Override
     public void onClick(DialogInterface dialog, int which) {
         DatabaseCertificate certificate = mCertificates.get(which);
-        if (SDK_INT >= Build.VERSION_CODES.R) {
-            // TODO Should always use this method?
-            mCertificatePending = certificate;
-            documentCreator.launch(certificate.getName());
-        } else {
+        if (SDK_INT >= Build.VERSION_CODES.P) {
+            // Use classic method for Android 9 and below
             saveCertificateClassic(certificate);
+        } else {
+            // For Android 10 and above, use SAF
+            mCertificatePending = certificate;
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.setType("application/x-pkcs12");
+            intent.putExtra(Intent.EXTRA_TITLE, certificate.getName());
+            startActivityForResult(intent, REQUEST_CREATE_DOCUMENT);
         }
     }
 
@@ -189,7 +199,7 @@ public class CertificateExportActivity extends AppCompatActivity implements Dial
     }
 
     private void showErrorDialog(int resourceId) {
-        new MaterialAlertDialogBuilder(this)
+        new AlertDialog.Builder(this)
                 .setMessage(resourceId)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();

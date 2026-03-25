@@ -21,7 +21,7 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import se.lublin.mumla.R;
 import se.lublin.mumla.Settings;
@@ -54,7 +54,7 @@ public class CertificateGenerateActivity extends AppCompatActivity {
     }
 
     private void showCompletionDialog(DatabaseCertificate result) {
-        new MaterialAlertDialogBuilder(this)
+        new AlertDialog.Builder(this)
                 .setMessage(getString(R.string.generateCertSuccess, result.getName()))
                 .setPositiveButton(android.R.string.ok, null)
                 .setOnDismissListener(dialog -> finish())

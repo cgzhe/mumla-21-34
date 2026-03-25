@@ -21,9 +21,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
@@ -50,7 +48,7 @@ public class MumlaCertificateGenerateTask extends AsyncTask<Void, Void, Database
     protected void onPreExecute() {
         super.onPreExecute();
 
-        loadingDialog = new MaterialAlertDialogBuilder(context)
+        loadingDialog = new AlertDialog.Builder(context)
                 .setTitle(R.string.generateCertProgress)
                 .setView(R.layout.dialog_progress)
                 .setCancelable(false)

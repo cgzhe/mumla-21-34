@@ -1,7 +1,7 @@
 package se.lublin.mumla.app;
 
 import static com.android.billingclient.api.BillingClient.BillingResponseCode.OK;
-import static com.android.billingclient.api.BillingClient.ProductType.INAPP;
+
 import static com.android.billingclient.api.Purchase.PurchaseState.PENDING;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static se.lublin.mumla.app.DialogUtils.maybeShowNewsDialog;
@@ -17,13 +17,12 @@ import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams;
+import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.PendingPurchasesParams;
+
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.QueryProductDetailsParams;
-import com.android.billingclient.api.QueryPurchasesParams;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import android.app.AlertDialog;
 
 import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
@@ -69,14 +68,14 @@ public class StartupAction implements IStartupAction {
         }
 
         billingClient = BillingClient.newBuilder(activity)
-                .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+                .enablePendingPurchases()
                 .setListener((result, purchases) -> {
                     // This is a callback for handling a new purchase
                     if ((result.getResponseCode() != OK) || (purchases == null)) {
                         return;
                     }
                     for (Purchase purchase : purchases) {
-                        if (purchase.getProducts().contains(DONATION_PRODUCT_ID)) {
+                        if (purchase.getSkuDetails() != null && purchase.getSkuDetails().getSku().equals(DONATION_PRODUCT_ID)) {
                             handleAndAckPurchase(activity, purchase, () -> {
                                 preferences.edit().putBoolean(PREF_HAS_DONATED, true).apply();
                                 showToast(activity, activity.getString(R.string.donate_thanks_goog));
@@ -95,15 +94,14 @@ public class StartupAction implements IStartupAction {
                 }
 
                 // Checking if already purchased, before possibly showing dialog
-                QueryPurchasesParams params = QueryPurchasesParams.newBuilder().setProductType(INAPP).build();
-                billingClient.queryPurchasesAsync(params, (queryResult, purchases) -> {
+                billingClient.queryPurchasesAsync(BillingClient.SkuType.INAPP, (queryResult, purchases) -> {
                     if (queryResult.getResponseCode() != OK) {
                         showToast(activity, String.format("Failed to query purchases: %s (code %d)", queryResult.getDebugMessage(), queryResult.getResponseCode()));
                         return;
                     }
                     boolean foundAndHandled = false;
                     for (Purchase purchase : purchases) {
-                        if (purchase.getProducts().contains(DONATION_PRODUCT_ID)) {
+                        if (purchase.getSkuDetails() != null && purchase.getSkuDetails().getSku().equals(DONATION_PRODUCT_ID)) {
                             handleAndAckPurchase(activity, purchase, () -> {
                                 preferences.edit().putBoolean(PREF_HAS_DONATED, true).apply();
                                 showToast(activity, activity.getString(R.string.donate_thanks_goog));
@@ -129,7 +127,7 @@ public class StartupAction implements IStartupAction {
 
     private void verifyPurchase(Activity activity, SharedPreferences preferences) {
         BillingClient client = BillingClient.newBuilder(activity)
-                .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+                .enablePendingPurchases()
                 .setListener((result, purchase) -> { /* NOP */ })
                 .build();
         client.startConnection(new BillingClientStateListener() {
@@ -139,14 +137,14 @@ public class StartupAction implements IStartupAction {
                     return;
                 }
                 client.queryPurchasesAsync(
-                        QueryPurchasesParams.newBuilder().setProductType(INAPP).build(),
+                        BillingClient.SkuType.INAPP,
                         (queryResult, purchases) -> {
                             if (queryResult.getResponseCode() != OK) {
                                 return;
                             }
                             boolean stillFound = false;
                             for (Purchase purchase : purchases) {
-                                if (purchase.getProducts().contains(DONATION_PRODUCT_ID) && purchase.isAcknowledged()) {
+                                if (purchase.getSkuDetails() != null && purchase.getSkuDetails().getSku().equals(DONATION_PRODUCT_ID) && purchase.isAcknowledged()) {
                                     stillFound = true;
                                     break;
                                 }
@@ -180,7 +178,7 @@ public class StartupAction implements IStartupAction {
                     R.drawable.ic_donate_waving_hand_goog,
             };
             int randomIconRes = icons[ThreadLocalRandom.current().nextInt(icons.length)];
-            new MaterialAlertDialogBuilder(activity)
+            new AlertDialog.Builder(activity)
                     .setTitle(R.string.donate_dialog_title_goog)
                     .setMessage(R.string.donate_dialog_message_goog)
                     .setIcon(randomIconRes)
@@ -197,24 +195,18 @@ public class StartupAction implements IStartupAction {
             return;
         }
 
-        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
-                .setProductList(Collections.singletonList(
-                        QueryProductDetailsParams.Product.newBuilder()
-                                .setProductId(DONATION_PRODUCT_ID)
-                                .setProductType(INAPP)
-                                .build()))
+        SkuDetailsParams params = SkuDetailsParams.newBuilder()
+                .setSkusList(Collections.singletonList(DONATION_PRODUCT_ID))
+                .setType(BillingClient.SkuType.INAPP)
                 .build();
-        billingClient.queryProductDetailsAsync(params, (queryResult, productDetails) -> {
-            if ((queryResult.getResponseCode() != OK) || productDetails.isEmpty()) {
+        billingClient.querySkuDetailsAsync(params, (queryResult, skuDetailsList) -> {
+            if ((queryResult.getResponseCode() != OK) || skuDetailsList == null || skuDetailsList.isEmpty()) {
                 showToast(activity, String.format("Failed to query product details: %s (code %d)", queryResult.getDebugMessage(), queryResult.getResponseCode()));
                 return;
             }
             activity.runOnUiThread(() -> {
                 BillingFlowParams flowParams = BillingFlowParams.newBuilder()
-                        .setProductDetailsParamsList(Collections.singletonList(
-                                ProductDetailsParams.newBuilder()
-                                        .setProductDetails(productDetails.get(0))
-                                        .build()))
+                        .setSkuDetails(skuDetailsList.get(0))
                         .build();
                 billingClient.launchBillingFlow(activity, flowParams);
             });

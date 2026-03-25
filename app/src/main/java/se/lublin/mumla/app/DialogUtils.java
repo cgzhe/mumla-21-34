@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -89,7 +89,7 @@ public final class DialogUtils {
         TextView newsTextView = dialogView.findViewById(R.id.news_text_view);
         newsTextView.setText(fromHtml(sb.toString(), 0));
 
-        new MaterialAlertDialogBuilder(context)
+        new AlertDialog.Builder(context)
                 .setTitle(R.string.app_news)
                 .setView(dialogView)
                 .setCancelable(false)

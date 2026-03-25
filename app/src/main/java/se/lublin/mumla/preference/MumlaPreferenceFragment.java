@@ -1,6 +1,8 @@
 package se.lublin.mumla.preference;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.app.Fragment;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -16,10 +18,10 @@ public abstract class MumlaPreferenceFragment extends PreferenceFragmentCompat {
     public boolean onPreferenceTreeClick(Preference preference) {
         final String fragment = preference.getFragment();
         if (fragment != null) {
-            Bundle bundle = new Bundle();
-            bundle.putString("fragmentClassName", fragment);
-            bundle.putCharSequence("title", preference.getTitle());
-            getParentFragmentManager().setFragmentResult("launchFragment", bundle);
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            intent.putExtra("fragmentClassName", fragment);
+            intent.putExtra("title", preference.getTitle());
+            getActivity().startActivity(intent);
             return true;
         }
         return super.onPreferenceTreeClick(preference);
@@ -28,21 +30,21 @@ public abstract class MumlaPreferenceFragment extends PreferenceFragmentCompat {
     @Override
     public void onDisplayPreferenceDialog(@NonNull Preference preference) {
         if (preference instanceof SeekBarDialogPreference) {
-            if (getParentFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
+            if (getFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
                 return;
             }
             final PreferenceDialogFragmentCompat dialogFragment = SeekBarPreferenceDialogFragment.newInstance(preference.getKey());
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
+            dialogFragment.show(getFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
             return;
         }
         if (preference instanceof KeySelectDialogPreference) {
-            if (getParentFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
+            if (getFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
                 return;
             }
             final PreferenceDialogFragmentCompat dialogFragment = KeySelectPreferenceDialogFragment.newInstance(preference.getKey());
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
+            dialogFragment.show(getFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
             return;
         }
         super.onDisplayPreferenceDialog(preference);

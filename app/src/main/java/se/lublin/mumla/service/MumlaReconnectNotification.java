@@ -19,7 +19,7 @@ package se.lublin.mumla.service;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
+
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -82,11 +82,7 @@ public class MumlaReconnectNotification {
         filter.addAction(BROADCAST_RECONNECT);
         filter.addAction(BROADCAST_CANCEL_RECONNECT);
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                mContext.registerReceiver(mNotificationReceiver, filter, RECEIVER_NOT_EXPORTED);
-            } else {
-                mContext.registerReceiver(mNotificationReceiver, filter);
-            }
+            mContext.registerReceiver(mNotificationReceiver, filter);
         } catch (IllegalArgumentException e) {
             // Thrown if receiver is already registered.
             e.printStackTrace();

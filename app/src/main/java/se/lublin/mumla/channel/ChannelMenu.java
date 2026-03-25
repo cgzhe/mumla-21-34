@@ -32,7 +32,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import se.lublin.humla.IHumlaService;
 import se.lublin.humla.IHumlaSession;
@@ -115,7 +115,7 @@ public class ChannelMenu implements PermissionsPopupMenu.IOnMenuPrepareListener,
             addFragment.setArguments(args);
             addFragment.show(mFragmentManager, "ChannelAdd");
         } else if (itemId == R.id.context_channel_remove) {
-            new MaterialAlertDialogBuilder(mContext)
+            new AlertDialog.Builder(mContext)
                     .setTitle(R.string.confirm)
                     .setMessage(R.string.confirm_delete_channel)
                     .setPositiveButton(android.R.string.ok, (dialog, which) -> {
@@ -156,7 +156,7 @@ public class ChannelMenu implements PermissionsPopupMenu.IOnMenuPrepareListener,
             final CheckBox linkedBox = new CheckBox(mContext);
             linkedBox.setText(R.string.shout_include_linked);
             layout.addView(linkedBox);
-            new MaterialAlertDialogBuilder(mContext)
+            new AlertDialog.Builder(mContext)
                     .setTitle(R.string.shout_configure)
                     .setView(layout)
                     .setPositiveButton(R.string.confirm, (dialog, which) -> {

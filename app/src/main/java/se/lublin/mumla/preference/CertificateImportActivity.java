@@ -28,7 +28,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 
@@ -110,7 +110,7 @@ public class CertificateImportActivity extends AppCompatActivity {
             final EditText passwordField = new EditText(this);
             passwordField.setHint(R.string.password);
             passwordField.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            new MaterialAlertDialogBuilder(this)
+            new AlertDialog.Builder(this)
                     .setTitle(R.string.decrypt_certificate)
                     .setView(passwordField)
                     .setOnCancelListener(dialog -> finish())

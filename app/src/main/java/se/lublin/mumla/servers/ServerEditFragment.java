@@ -31,8 +31,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import se.lublin.humla.model.Server;
 import se.lublin.mumla.R;
 import se.lublin.mumla.Settings;
@@ -142,7 +140,7 @@ public class ServerEditFragment extends DialogFragment {
             mNameEdit.setVisibility(View.GONE);
         }
 
-        return new MaterialAlertDialogBuilder(requireActivity())
+        return new AlertDialog.Builder(requireActivity())
                 .setPositiveButton(actionName, null)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setView(view)

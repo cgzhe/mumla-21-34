@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Base.Theme.Mumla" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Mumla" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryDark">@color/md_theme_light_primary</item>
+        <item name="colorAccent">@color/md_theme_light_primary</item>
         <item name="pttPressed">@color/md_theme_light_primary_darker</item>
         <!-- Make it so appbar's popupmenu has light theme, even though appbar has dark -->
-        <item name="popupOverlay">@style/ThemeOverlay.Material3.Light</item>
+        <item name="popupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
         <!-- Make the Chat Target "banner" ActionMode obscure the ActionBar,
         instead of pushing it (and the rest of the layout) down. -->
         <item name="windowActionModeOverlay">true</item>
@@ -19,7 +20,7 @@
         <!-- Set background to primary color of theme -->
         <item name="android:background">?attr/colorPrimary</item>
         <!-- Use dark actionbar theme to ensure text/icons are light -->
-        <item name="android:theme">@style/ThemeOverlay.Material3.Dark.ActionBar</item>
+        <item name="android:theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
     <style name="App.Widget.ActionMode" parent="Widget.AppCompat.ActionMode">

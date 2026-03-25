@@ -29,7 +29,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.app.AlertDialog;
 
 import java.util.List;
 
@@ -125,7 +125,7 @@ public class UserMenu implements PermissionsPopupMenu.IOnMenuPrepareListener, Po
         if (itemId == R.id.context_ban || itemId == R.id.context_kick) {
             final EditText reasonField = new EditText(mContext);
             reasonField.setHint(R.string.hint_reason);
-            new MaterialAlertDialogBuilder(mContext)
+            new AlertDialog.Builder(mContext)
                     .setTitle(R.string.user_menu_kick)
                     .setView(reasonField)
                     .setPositiveButton(R.string.user_menu_kick, (dialog, which) ->
@@ -151,7 +151,7 @@ public class UserMenu implements PermissionsPopupMenu.IOnMenuPrepareListener, Po
         } else if (itemId == R.id.context_view_comment) {
             showUserComment(false);
         } else if (itemId == R.id.context_reset_comment) {
-            new MaterialAlertDialogBuilder(mContext)
+            new AlertDialog.Builder(mContext)
                     .setMessage(mContext.getString(R.string.confirm_reset_comment, mUser.getName()))
                     .setPositiveButton(R.string.confirm, (dialog, which) ->
                             mService.setUserComment(mUser.getSession(), ""))
@@ -181,7 +181,7 @@ public class UserMenu implements PermissionsPopupMenu.IOnMenuPrepareListener, Po
         for (int i = 0; i < channels.size(); i++) {
             channelNames[i] = channels.get(i).getName();
         }
-        new MaterialAlertDialogBuilder(mContext)
+        new AlertDialog.Builder(mContext)
                 .setTitle(R.string.user_menu_move)
                 .setItems(channelNames, (dialog, which) -> {
                     IChannel channel = channels.get(which);
