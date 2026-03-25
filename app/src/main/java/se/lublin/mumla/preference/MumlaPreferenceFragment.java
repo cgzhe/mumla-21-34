@@ -30,21 +30,21 @@ public abstract class MumlaPreferenceFragment extends PreferenceFragmentCompat {
     @Override
     public void onDisplayPreferenceDialog(@NonNull Preference preference) {
         if (preference instanceof SeekBarDialogPreference) {
-            if (getFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
+            if (getParentFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
                 return;
             }
             final PreferenceDialogFragmentCompat dialogFragment = SeekBarPreferenceDialogFragment.newInstance(preference.getKey());
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
+            dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
             return;
         }
         if (preference instanceof KeySelectDialogPreference) {
-            if (getFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
+            if (getParentFragmentManager().findFragmentByTag("androidx.preference.PreferenceFragment.DIALOG") != null) {
                 return;
             }
             final PreferenceDialogFragmentCompat dialogFragment = KeySelectPreferenceDialogFragment.newInstance(preference.getKey());
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(getFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
+            dialogFragment.show(getParentFragmentManager(), "androidx.preference.PreferenceFragment.DIALOG");
             return;
         }
         super.onDisplayPreferenceDialog(preference);

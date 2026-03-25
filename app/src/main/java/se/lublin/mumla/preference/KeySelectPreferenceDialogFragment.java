@@ -63,13 +63,23 @@ public class KeySelectPreferenceDialogFragment extends PreferenceDialogFragmentC
         if (event.getAction() != KeyEvent.ACTION_DOWN) {
             return false;
         }
-        if (keyCode != KeyEvent.KEYCODE_BACK) {
+        // 方向键和确认键不被捕获，用于对话框按钮导航
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            dismiss();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP || 
+                   keyCode == KeyEvent.KEYCODE_DPAD_DOWN || 
+                   keyCode == KeyEvent.KEYCODE_DPAD_LEFT || 
+                   keyCode == KeyEvent.KEYCODE_DPAD_RIGHT || 
+                   keyCode == KeyEvent.KEYCODE_ENTER || 
+                   keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+            // 让系统处理这些按键，用于导航和确认
+            return false;
+        } else {
             mCurrentValue = keyCode;
             updateValueView();
-        } else {
-            dismiss();
+            return true;
         }
-        return true;
     }
 
     private void updateValueView() {

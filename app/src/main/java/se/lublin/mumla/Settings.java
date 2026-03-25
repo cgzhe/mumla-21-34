@@ -56,7 +56,7 @@ public class Settings {
     public static final int DEFAULT_THRESHOLD = 50;
 
     public static final String PREF_PUSH_KEY = "talkKey";
-    public static final Integer DEFAULT_PUSH_KEY = -1;
+    public static final Integer DEFAULT_PUSH_KEY = 261;
 
     public static final String PREF_HOT_CORNER_KEY = "hotCorner";
     public static final String ARRAY_HOT_CORNER_NONE = "none";
